@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import '../login/widgets/login_widgets.dart';
+import 'widgets/sign_up_widgets.dart';
+import 'widgets/signup_background.dart';
+import 'data/signup_repository.dart';
+import 'verification_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -12,6 +16,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final SignupRepository _repository = SignupRepository();
   bool _isPasswordVisible = false;
   String _userRole = 'Passenger';
 
@@ -23,26 +28,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
+  void _showNotification(String message, {bool isError = false}) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? Colors.redAccent : Colors.green,
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.all(20),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Stack(
         children: [
-          const _SharedBackground(),
-          Positioned.fill(child: CustomPaint(painter: DotGridPainter())),
+          const SignupBackground(),
           SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 30.0),
               child: Column(
                 children: [
                   const SizedBox(height: 60),
-                  _buildHeader(),
+                  const SignupHeader(),
                   const SizedBox(height: 40),
-                  _buildRoleSelector(),
+                  RoleSelector(
+                    selectedRole: _userRole,
+                    onRoleSelected: (role) => setState(() => _userRole = role),
+                  ),
                   const SizedBox(height: 32),
-
-                  // FORM FIELDS
                   LoginInput(
                     controller: _emailController,
                     label: 'Email Address',
@@ -69,122 +87,77 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     label: 'Confirm Password',
                     obscureText: true,
                   ),
-
-                  // DIVIDER REMOVED HERE
                   const SizedBox(height: 40),
-
-                  PrimaryButton(label: 'Register Account', onPressed: () {}),
+                  PrimaryButton(
+                    label: 'Register Account',
+                    onPressed: () async {
+                      final email = _emailController.text.trim();
+                      final password = _passwordController.text;
+                      if (password != _confirmPasswordController.text) {
+                        _showNotification(
+                          "Passwords do not match",
+                          isError: true,
+                        );
+                        return;
+                      }
+                      try {
+                        await _repository.registerUser(
+                          email,
+                          password,
+                          _userRole,
+                        );
+                        if (!mounted) return;
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                VerificationScreen(email: email),
+                          ),
+                        );
+                      } catch (e) {
+                        if (!mounted) return;
+                        _showNotification(
+                          e.toString().replaceAll("Exception: ", ""),
+                          isError: true,
+                        );
+                      }
+                    },
+                  ),
                   const SizedBox(height: 24),
-                  _buildFooter(context),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Have an account already? ",
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: const Text(
+                          'Login',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 60),
+                  const Text(
+                    'Digital Solutions You Can Trust.',
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 12,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return const Column(
-      children: [
-        Text(
-          'Hop In · Register Your\nByahe Account',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.w800,
-            height: 1.2,
-          ),
-        ),
-        SizedBox(height: 12),
-        Text(
-          'Access your rides. Track trips. Manage your travels with ease.',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: Color(0xFF607D8B),
-            fontSize: 14,
-            fontStyle: FontStyle.italic,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildRoleSelector() {
-    return Row(
-      children: [
-        Expanded(child: _roleToggle('Passenger')),
-        const SizedBox(width: 16),
-        Expanded(child: _roleToggle('Rider')),
-      ],
-    );
-  }
-
-  Widget _roleToggle(String role) {
-    bool isSelected = _userRole == role;
-    return GestureDetector(
-      onTap: () => setState(() => _userRole = role),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        decoration: BoxDecoration(
-          color: isSelected ? Colors.grey[300] : Colors.white.withOpacity(0.5),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? Colors.grey[400]! : Colors.transparent,
-          ),
-        ),
-        child: Center(
-          child: Text(
-            role,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFooter(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "Have an account already? ",
-              style: TextStyle(color: Colors.grey[600]),
-            ),
-            GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: const Text(
-                'Login',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 40),
-        const Text(
-          'Digital Solutions You Can Trust.',
-          style: TextStyle(color: Colors.grey, fontSize: 12),
-        ),
-      ],
-    );
-  }
-}
-
-class _SharedBackground extends StatelessWidget {
-  const _SharedBackground();
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFFFFFFFF), Color(0xFFF1F7FF), Color(0xFFD7E9FF)],
-        ),
       ),
     );
   }

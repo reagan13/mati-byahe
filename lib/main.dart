@@ -1,10 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'core/database/sync_service.dart';
 import 'onboarding/onboarding_screen.dart';
 import 'login/login_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
+
+  await Supabase.initialize(
+    url: dotenv.env['SUPABASE_URL'] ?? '',
+    anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
+  );
+
+  SyncService().syncOnStart();
 
   final prefs = await SharedPreferences.getInstance();
   final bool onboardingCompleted =
@@ -15,7 +26,6 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   final bool onboardingCompleted;
-
   const MyApp({super.key, required this.onboardingCompleted});
 
   @override
@@ -26,7 +36,9 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
         useMaterial3: true,
       ),
-      home: const OnboardingScreen(),
+      home: onboardingCompleted
+          ? const LoginScreen()
+          : const OnboardingScreen(),
       debugShowCheckedModeBanner: false,
     );
   }

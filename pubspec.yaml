@@ -1,6 +1,6 @@
 name: mati_byahe
 description: "A new Flutter project for fair transport fares in Mati City using QR codes."
-publish_to: "none" # Remove this line if you wish to publish to pub.dev
+publish_to: "none"
 
 version: 1.0.0+1
 
@@ -11,37 +11,29 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # Onboarding carousel smooth dots
+  # UI & Navigation
   smooth_page_indicator: ^1.2.0
-
-  # To remember if onboarding was seen
-  shared_preferences: ^2.3.0
-
-  # Cupertino icons (optional, but good for iOS-style fallback)
   cupertino_icons: ^1.0.8
+
+  # Storage & Auth
+  shared_preferences: ^2.3.0
+  supabase_flutter: ^2.6.0 # MOVED FROM DEV_DEPENDENCIES
+  sqflite: ^2.3.0 # MOVED FROM DEV_DEPENDENCIES
+  path: ^1.9.0 # MOVED FROM DEV_DEPENDENCIES
+  pin_code_fields: ^8.0.1
+  mailer: ^6.1.0
+
+  # Environment Variables
+  flutter_dotenv: ^5.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  # Recommended lint rules
-  flutter_lints: ^6.0.0
+  flutter_lints: ^3.0.0
 
 flutter:
-  # Enables Material Design icons
   uses-material-design: true
 
-  # Assets declaration – only this one line is needed
-  # This includes everything inside assets/images/ (onboarding1.jpg, etc.)
   assets:
     - assets/images/
-
-  # If you add custom fonts later, put them here like this:
-  # fonts:
-  #   - family: CustomFont
-  #     fonts:
-  #       - asset: fonts/CustomFont-Regular.ttf
-
-  # For more info about assets, fonts, etc.:
-  # https://flutter.dev/to/resolution-aware-images
-  # https://flutter.dev/to/font-from-package
+    - .env # Added this for your credentials
