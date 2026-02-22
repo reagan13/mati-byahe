@@ -18,18 +18,41 @@ class SyncService {
 
     for (var user in unsyncedUsers) {
       try {
-        await _supabase.from('profiles').upsert({
-          'id': user['id'],
-          'email': user['email'],
-          'role': user['role'],
-        });
+        String? supabaseUid;
 
-        await db.update(
-          'users',
-          {'is_synced': 1},
-          where: 'id = ?',
-          whereArgs: [user['id']],
-        );
+        try {
+          final AuthResponse res = await _supabase.auth.signUp(
+            email: user['email'],
+            password: user['password'],
+          );
+          supabaseUid = res.user?.id;
+        } on AuthException catch (ae) {
+          if (ae.message.contains('already registered')) {
+            final AuthResponse loginRes = await _supabase.auth
+                .signInWithPassword(
+                  email: user['email'],
+                  password: user['password'],
+                );
+            supabaseUid = loginRes.user?.id;
+          } else {
+            rethrow;
+          }
+        }
+
+        if (supabaseUid != null) {
+          await _supabase.from('profiles').upsert({
+            'id': supabaseUid,
+            'email': user['email'],
+            'role': user['role'],
+          });
+
+          await db.update(
+            'users',
+            {'is_synced': 1, 'id': supabaseUid},
+            where: 'email = ?',
+            whereArgs: [user['email']],
+          );
+        }
       } catch (e) {
         continue;
       }

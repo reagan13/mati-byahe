@@ -16,12 +16,11 @@ class LocalDatabase {
 
     return await openDatabase(
       pathName,
-      version: 3,
+      version: 4,
       onCreate: (db, version) async {
         await _createTables(db);
       },
       onUpgrade: (db, oldVersion, newVersion) async {
-        await db.execute('DROP TABLE IF EXISTS users');
         await _createTables(db);
       },
     );
@@ -29,9 +28,10 @@ class LocalDatabase {
 
   Future<void> _createTables(Database db) async {
     await db.execute('''
-      CREATE TABLE users(
+      CREATE TABLE IF NOT EXISTS users(
         id TEXT PRIMARY KEY,
         email TEXT UNIQUE,
+        password TEXT,
         role TEXT,
         is_verified INTEGER DEFAULT 0,
         is_synced INTEGER DEFAULT 0

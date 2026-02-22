@@ -1,7 +1,6 @@
 name: mati_byahe
 description: "A new Flutter project for fair transport fares in Mati City using QR codes."
 publish_to: "none"
-
 version: 1.0.0+1
 
 environment:
@@ -10,20 +9,15 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
-  # UI & Navigation
   smooth_page_indicator: ^1.2.0
   cupertino_icons: ^1.0.8
-
-  # Storage & Auth
   shared_preferences: ^2.3.0
-  supabase_flutter: ^2.6.0 # MOVED FROM DEV_DEPENDENCIES
-  sqflite: ^2.3.0 # MOVED FROM DEV_DEPENDENCIES
-  path: ^1.9.0 # MOVED FROM DEV_DEPENDENCIES
+  supabase_flutter: ^2.6.0
+  sqflite: ^2.3.0
+  sqflite_common_ffi: ^2.3.3
+  path: ^1.9.0
   pin_code_fields: ^8.0.1
   mailer: ^6.1.0
-
-  # Environment Variables
   flutter_dotenv: ^5.1.0
 
 dev_dependencies:
@@ -33,7 +27,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-
   assets:
     - assets/images/
-    - .env # Added this for your credentials
+    - .env

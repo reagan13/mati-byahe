@@ -1,13 +1,22 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'core/database/sync_service.dart';
 import 'onboarding/onboarding_screen.dart';
 import 'login/login_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+  }
+
   await dotenv.load(fileName: ".env");
 
   await Supabase.initialize(
@@ -15,7 +24,11 @@ void main() async {
     anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
   );
 
-  SyncService().syncOnStart();
+  try {
+    await SyncService().syncOnStart();
+  } catch (e) {
+    debugPrint("Sync failed: $e");
+  }
 
   final prefs = await SharedPreferences.getInstance();
   final bool onboardingCompleted =

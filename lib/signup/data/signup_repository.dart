@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:sqflite/sqflite.dart';
 import '../../core/database/local_database.dart';
 
 class SignupRepository {
@@ -15,23 +16,46 @@ class SignupRepository {
     );
 
     if (existing.isNotEmpty && existing.first['is_verified'] == 1) {
-      throw Exception("Email already verified.");
+      throw Exception("This email is already registered. Please log in!");
     }
 
-    await supabase.auth.signUp(
-      email: email,
-      password: password,
-      data: {'role': role},
-    );
+    try {
+      final AuthResponse res = await supabase.auth.signUp(
+        email: email,
+        password: password,
+        data: {'role': role},
+      );
 
-    if (existing.isEmpty) {
-      await db.insert('users', {
-        'id': DateTime.now().millisecondsSinceEpoch.toString(),
-        'email': email,
-        'role': role,
-        'is_verified': 0,
-        'is_synced': 0,
-      });
+      if (res.user != null) {
+        await supabase.from('profiles').upsert({
+          'id': res.user!.id,
+          'email': email,
+          'role': role,
+        });
+
+        await db.insert('users', {
+          'id': res.user!.id,
+          'email': email,
+          'password': password,
+          'role': role,
+          'is_verified': 0,
+          'is_synced': 1,
+        }, conflictAlgorithm: ConflictAlgorithm.replace);
+      }
+    } catch (e) {
+      if (e.toString().contains("SocketException") ||
+          e.toString().contains("network")) {
+        await db.insert('users', {
+          'id': DateTime.now().millisecondsSinceEpoch.toString(),
+          'email': email,
+          'password': password,
+          'role': role,
+          'is_verified': 0,
+          'is_synced': 0,
+        }, conflictAlgorithm: ConflictAlgorithm.replace);
+        throw Exception("Offline: Account created locally!");
+      }
+      rethrow;
     }
   }
 

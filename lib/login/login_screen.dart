@@ -1,7 +1,11 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../core/constant/app_colors.dart';
+import '../core/database/local_database.dart';
 import 'widgets/login_widgets.dart';
 import '../signup/register_screen.dart';
+import '../home/home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,13 +17,93 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final LocalDatabase _localDb = LocalDatabase();
   bool _isPasswordVisible = false;
+  bool _isLoading = false;
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  void _showNotification(String message, {bool isError = true}) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? Colors.redAccent : Colors.green,
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.all(20),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
+  Future<void> _handleLogin() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
+      _showNotification("Please enter both email and password");
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final db = await _localDb.database;
+      final List<Map<String, dynamic>> localUsers = await db.query(
+        'users',
+        where: 'email = ? AND password = ?',
+        whereArgs: [email, password],
+      );
+
+      if (localUsers.isEmpty) {
+        _showNotification("Invalid email or password.");
+        return;
+      }
+
+      final String role = localUsers.first['role'] ?? "Passenger";
+
+      try {
+        final internetResult = await InternetAddress.lookup('google.com');
+        if (internetResult.isNotEmpty &&
+            internetResult[0].rawAddress.isNotEmpty) {
+          try {
+            await Supabase.instance.client.auth.signInWithPassword(
+              email: email,
+              password: password,
+            );
+          } on AuthException catch (e) {
+            if (e.message.contains('Invalid login credentials') ||
+                e.statusCode == '400') {
+              await Supabase.instance.client.auth.signUp(
+                email: email,
+                password: password,
+                data: {'role': role},
+              );
+            }
+          }
+        }
+      } catch (_) {}
+
+      _navigateToHome(email, role);
+    } catch (e) {
+      _showNotification("An error occurred during login.");
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _navigateToHome(String email, String role) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HomeScreen(email: email, role: role),
+      ),
+    );
   }
 
   @override
@@ -74,7 +158,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 40),
-                  PrimaryButton(label: 'Login', onPressed: () {}),
+                  _isLoading
+                      ? const CircularProgressIndicator(
+                          color: AppColors.primaryBlue,
+                        )
+                      : PrimaryButton(label: 'Login', onPressed: _handleLogin),
                   const SizedBox(height: 20),
                   const LoginDivider(),
                   const SizedBox(height: 20),

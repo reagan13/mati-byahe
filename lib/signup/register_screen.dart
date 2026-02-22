@@ -130,10 +130,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         );
                       } catch (e) {
                         if (!mounted) return;
-                        _showNotification(
-                          e.toString().replaceAll("Exception: ", ""),
-                          isError: true,
-                        );
+                        String msg = e.toString().replaceAll("Exception: ", "");
+                        bool isOfflineSuccess = msg.contains("Offline");
+
+                        _showNotification(msg, isError: !isOfflineSuccess);
+
+                        if (isOfflineSuccess) {
+                          Future.delayed(const Duration(seconds: 2), () {
+                            if (mounted) Navigator.pop(context);
+                          });
+                        }
                       }
                     },
                   ),
