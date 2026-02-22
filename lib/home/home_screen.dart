@@ -62,68 +62,77 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading)
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-
-    if (!_isVerified) {
-      return Scaffold(
-        backgroundColor: Colors.white,
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.lock_person_rounded,
-                size: 80,
-                color: AppColors.primaryYellow,
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                "Access Restricted",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.darkNavy,
-                ),
-              ),
-              const SizedBox(height: 32),
-              VerificationOverlay(
-                isSendingCode: _isSendingCode,
-                onVerify: _handleVerification,
-              ),
-            ],
-          ),
-        ),
+    if (_isLoading) {
+      return Container(
+        color: Colors.white,
+        child: const Center(child: CircularProgressIndicator()),
       );
     }
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            HomeHeader(email: widget.email, role: widget.role),
-            const Padding(
-              padding: EdgeInsets.fromLTRB(10, 20, 10, 12),
-              child: Text(
-                'Active Status',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.darkNavy,
-                ),
+    return SizedBox.expand(
+      child: Material(
+        color: Colors.white,
+        child: !_isVerified ? _buildRestrictedView() : _buildHomeContent(),
+      ),
+    );
+  }
+
+  Widget _buildRestrictedView() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.lock_person_rounded,
+            size: 80,
+            color: AppColors.primaryYellow,
+          ),
+          const SizedBox(height: 24),
+          const Text(
+            "Access Restricted",
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w900,
+              color: AppColors.darkNavy,
+            ),
+          ),
+          const SizedBox(height: 32),
+          VerificationOverlay(
+            isSendingCode: _isSendingCode,
+            onVerify: _handleVerification,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHomeContent() {
+    return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.only(bottom: 120),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          HomeHeader(email: widget.email, role: widget.role),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(10, 20, 10, 12),
+            child: Text(
+              'Active Status',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: AppColors.darkNavy,
               ),
             ),
-            const DashboardCards(
-              tripCount: 4,
-              driverName: "Lito Lapid",
-              plateNumber: "CLB 4930",
-            ),
-            const LocationSelector(),
-          ],
-        ),
+          ),
+          const DashboardCards(
+            tripCount: 4,
+            driverName: "Lito Lapid",
+            plateNumber: "CLB 4930",
+          ),
+          const LocationSelector(),
+        ],
       ),
     );
   }

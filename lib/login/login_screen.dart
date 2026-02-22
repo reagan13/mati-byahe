@@ -5,7 +5,7 @@ import '../core/constant/app_colors.dart';
 import '../core/database/local_database.dart';
 import 'widgets/login_widgets.dart';
 import '../signup/register_screen.dart';
-import '../home/home_screen.dart';
+import '../navbar/main_navigation.dart'; // Import MainNavigation instead of HomeScreen
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -101,7 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => HomeScreen(email: email, role: role),
+        builder: (context) => MainNavigation(email: email, role: role),
       ),
     );
   }

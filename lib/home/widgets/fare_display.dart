@@ -24,21 +24,23 @@ class FareDisplay extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Left Side: Time Estimate
+            // Left Side: Time Estimate (Centered Icon & Text)
             Expanded(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Icon(
                     Icons.timer_outlined,
                     size: 22,
                     color: AppColors.darkNavy.withOpacity(0.5),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
                   Text(
                     '15-20 min',
+                    textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 11,
                       fontWeight: FontWeight.w700,
                       color: AppColors.darkNavy.withOpacity(0.7),
                     ),
@@ -47,31 +49,30 @@ class FareDisplay extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(width: 20),
-
-            // Center: Price
+            // Center: Price Section
             Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(top: 12),
+                      padding: const EdgeInsets.only(top: 14),
                       child: Text(
                         '₱',
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: 22,
                           fontWeight: FontWeight.w900,
                           color: AppColors.primaryBlue.withOpacity(0.4),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: 2),
                     Text(
                       '${fare.toStringAsFixed(0)}',
                       style: const TextStyle(
-                        fontSize: 86,
+                        fontSize: 80,
                         fontWeight: FontWeight.w900,
                         color: AppColors.primaryBlue,
                         letterSpacing: -4,
@@ -80,9 +81,10 @@ class FareDisplay extends StatelessWidget {
                     ),
                   ],
                 ),
+                const SizedBox(height: 2),
                 Container(
                   height: 3,
-                  width: 40,
+                  width: 35,
                   decoration: BoxDecoration(
                     color: AppColors.primaryYellow,
                     borderRadius: BorderRadius.circular(2),
@@ -91,23 +93,23 @@ class FareDisplay extends StatelessWidget {
               ],
             ),
 
-            const SizedBox(width: 20),
-
-            // Right Side: Insurance Status
+            // Right Side: Insurance Status (Centered Icon & Text)
             Expanded(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const Icon(
                     Icons.verified_user_outlined,
                     size: 22,
                     color: Color(0xFF4CAF50),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
                   Text(
                     'Insured',
+                    textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 11,
                       fontWeight: FontWeight.w700,
                       color: AppColors.darkNavy.withOpacity(0.7),
                     ),
@@ -117,7 +119,7 @@ class FareDisplay extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 30),
+        const SizedBox(height: 35),
         Text(
           'Standard rates applied based on local guidelines.',
           textAlign: TextAlign.center,
