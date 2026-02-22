@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 
 class LocationSelector extends StatefulWidget {
-  final String initialPickup;
-  final String initialDrop;
+  final String? initialPickup;
+  final String? initialDrop;
 
-  const LocationSelector({
-    super.key,
-    required this.initialPickup,
-    required this.initialDrop,
-  });
+  const LocationSelector({super.key, this.initialPickup, this.initialDrop});
 
   @override
   State<LocationSelector> createState() => _LocationSelectorState();
@@ -88,23 +84,23 @@ class _LocationSelectorState extends State<LocationSelector> {
               color: Color(0xFF1A1D1E),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 18),
           Row(
             children: [
               Expanded(
-                child: _buildLocationButton(
-                  label: 'Pickup',
-                  value: _pickup ?? widget.initialPickup,
+                child: _buildFloatingLocationButton(
+                  label: 'Pick-up Point',
+                  value: _pickup,
                   icon: Icons.circle,
                   iconColor: const Color(0xFF2196F3),
                   onTap: () => _openLocationSearch(true),
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 12),
               Expanded(
-                child: _buildLocationButton(
-                  label: 'Drop-off',
-                  value: _drop ?? widget.initialDrop,
+                child: _buildFloatingLocationButton(
+                  label: 'Drop-off Point',
+                  value: _drop,
                   icon: Icons.location_on,
                   iconColor: const Color(0xFFF44336),
                   onTap: () => _openLocationSearch(false),
@@ -117,56 +113,53 @@ class _LocationSelectorState extends State<LocationSelector> {
     );
   }
 
-  Widget _buildLocationButton({
+  Widget _buildFloatingLocationButton({
     required String label,
-    required String value,
+    required String? value,
     required IconData icon,
     required Color iconColor,
     required VoidCallback onTap,
   }) {
-    return GestureDetector(
+    final bool hasValue = value != null && value.isNotEmpty;
+
+    return InkWell(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: const Color(0xFF2196F3).withOpacity(0.3),
-            width: 1,
+      borderRadius: BorderRadius.circular(14),
+      child: InputDecorator(
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(
+            color: Colors.grey.shade600,
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.02),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+          floatingLabelBehavior: hasValue
+              ? FloatingLabelBehavior.always
+              : FloatingLabelBehavior.never,
+          prefixIcon: Icon(icon, color: iconColor, size: 16),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 10,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: BorderSide(
+              color: const Color(0xFF2196F3).withOpacity(0.3),
             ),
-          ],
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: Color(0xFF2196F3)),
+          ),
         ),
-        child: Row(
-          children: [
-            Icon(icon, color: iconColor, size: 14),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: TextStyle(color: Colors.grey.shade500, fontSize: 10),
-                  ),
-                  Text(
-                    value,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ],
+        child: Text(
+          hasValue ? value! : label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: hasValue ? FontWeight.w700 : FontWeight.w400,
+            color: hasValue ? Colors.black : Colors.grey.shade500,
+          ),
+          overflow: TextOverflow.ellipsis,
         ),
       ),
     );
@@ -252,7 +245,7 @@ class _LocationSearchSheetState extends State<_LocationSearchSheet> {
               autofocus: true,
               onChanged: _filterSearch,
               decoration: InputDecoration(
-                hintText: 'Search barangay in Mati...',
+                hintText: 'Search barangay...',
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
                 fillColor: Colors.grey.shade100,

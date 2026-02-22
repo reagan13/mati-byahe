@@ -40,38 +40,6 @@ class _HomeScreenState extends State<HomeScreen> {
     SyncService().syncOnStart();
   }
 
-  void _showWarning(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: const Color(0xFFFDEDED),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.all(24),
-        elevation: 0,
-        content: Row(
-          children: [
-            const Icon(
-              Icons.warning_amber_rounded,
-              color: Color(0xFFD32F2F),
-              size: 20,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                message,
-                style: const TextStyle(
-                  color: Color(0xFFD32F2F),
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Future<void> _handleVerification() async {
     setState(() => _isSendingCode = true);
     try {
@@ -84,7 +52,9 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ).then((_) => _loadStatus());
     } catch (e) {
-      if (mounted) _showWarning("Action failed. Check connection.");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Action failed. Check connection.")),
+      );
     } finally {
       if (mounted) setState(() => _isSendingCode = false);
     }
@@ -96,18 +66,57 @@ class _HomeScreenState extends State<HomeScreen> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
+    if (!_isVerified) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          automaticallyImplyLeading: false,
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.lock_person_rounded,
+                size: 80,
+                color: AppColors.primaryYellow,
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                "Access Restricted",
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w900,
+                  color: AppColors.darkNavy,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                "Your account is not yet verified. Please verify your email to access the dashboard features.",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 14, color: Colors.grey),
+              ),
+              const SizedBox(height: 32),
+              VerificationOverlay(
+                isSendingCode: _isSendingCode,
+                onVerify: _handleVerification,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             HomeHeader(email: widget.email, role: widget.role),
-            if (!_isVerified)
-              VerificationOverlay(
-                isSendingCode: _isSendingCode,
-                onVerify: _handleVerification,
-              ),
             const Padding(
               padding: EdgeInsets.fromLTRB(24, 20, 24, 12),
               child: Text(
@@ -124,10 +133,7 @@ class _HomeScreenState extends State<HomeScreen> {
               driverName: "Lito Lapid",
               plateNumber: "CLB 4930",
             ),
-            const LocationSelector(
-              initialPickup: "Madang",
-              initialDrop: "Dahican",
-            ),
+            const LocationSelector(initialPickup: null, initialDrop: null),
           ],
         ),
       ),
