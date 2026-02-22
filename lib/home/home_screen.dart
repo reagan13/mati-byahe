@@ -52,9 +52,9 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ).then((_) => _loadStatus());
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Action failed. Check connection.")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Error")));
     } finally {
       if (mounted) setState(() => _isSendingCode = false);
     }
@@ -62,18 +62,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
+    if (_isLoading)
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
 
     if (!_isVerified) {
       return Scaffold(
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          automaticallyImplyLeading: false,
-        ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10.0),
           child: Column(
@@ -92,12 +86,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   fontWeight: FontWeight.w900,
                   color: AppColors.darkNavy,
                 ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                "Your account is not yet verified. Please verify your email to access the dashboard features.",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: Colors.grey),
               ),
               const SizedBox(height: 32),
               VerificationOverlay(
@@ -133,7 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
               driverName: "Lito Lapid",
               plateNumber: "CLB 4930",
             ),
-            const LocationSelector(initialPickup: null, initialDrop: null),
+            const LocationSelector(),
           ],
         ),
       ),

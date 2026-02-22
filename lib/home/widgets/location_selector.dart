@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'location_input_field.dart';
 import 'location_search_sheet.dart';
+import 'fare_display.dart';
 import '../../core/constant/app_colors.dart';
 
 class LocationSelector extends StatefulWidget {
-  final String? initialPickup;
-  final String? initialDrop;
-
-  const LocationSelector({super.key, this.initialPickup, this.initialDrop});
+  const LocationSelector({super.key});
 
   @override
   State<LocationSelector> createState() => _LocationSelectorState();
@@ -16,6 +14,17 @@ class LocationSelector extends StatefulWidget {
 class _LocationSelectorState extends State<LocationSelector> {
   String? _pickup;
   String? _drop;
+
+  final Map<String, double> _fixedRouteFares = {
+    'Badas_Dahican': 45.0,
+    'Badas_Central': 35.0,
+    'Central_Dahican': 30.0,
+    'Matiao_Central': 25.0,
+    'Sainz_Central': 28.0,
+    'Dahican_Matiao': 48.0,
+    'Badas_Matiao': 42.0,
+    'Badas_Sainz': 38.0,
+  };
 
   final List<String> _matiBarangays = [
     'Badas',
@@ -44,11 +53,17 @@ class _LocationSelectorState extends State<LocationSelector> {
     'Tuatua',
   ];
 
-  @override
-  void initState() {
-    super.initState();
-    _pickup = widget.initialPickup;
-    _drop = widget.initialDrop;
+  double? _calculateFare() {
+    if (_pickup == null || _drop == null || _pickup == _drop) return null;
+
+    List<String> route = [_pickup!, _drop!]..sort();
+    String key = route.join('_');
+
+    if (_fixedRouteFares.containsKey(key)) return _fixedRouteFares[key];
+
+    int idx1 = _matiBarangays.indexOf(_pickup!);
+    int idx2 = _matiBarangays.indexOf(_drop!);
+    return 20.0 + ((idx1 - idx2).abs() * 6.5) + (idx1 % 5);
   }
 
   void _openLocationSearch(bool isPickup) {
@@ -73,6 +88,8 @@ class _LocationSelectorState extends State<LocationSelector> {
 
   @override
   Widget build(BuildContext context) {
+    final fare = _calculateFare();
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
       child: Column(
@@ -110,6 +127,7 @@ class _LocationSelectorState extends State<LocationSelector> {
               ),
             ],
           ),
+          if (fare != null) FareDisplay(fare: fare),
         ],
       ),
     );
