@@ -24,13 +24,14 @@ class FareDisplay extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            // Left Side: Time Estimate
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Icon(
                     Icons.timer_outlined,
-                    size: 20,
+                    size: 22,
                     color: AppColors.darkNavy.withOpacity(0.5),
                   ),
                   const SizedBox(height: 4),
@@ -45,7 +46,10 @@ class FareDisplay extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: 15),
+
+            const SizedBox(width: 20),
+
+            // Center: Price
             Column(
               children: [
                 Row(
@@ -86,14 +90,17 @@ class FareDisplay extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(width: 15),
+
+            const SizedBox(width: 20),
+
+            // Right Side: Insurance Status
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Icon(
                     Icons.verified_user_outlined,
-                    size: 20,
+                    size: 22,
                     color: Color(0xFF4CAF50),
                   ),
                   const SizedBox(height: 4),
@@ -110,41 +117,15 @@ class FareDisplay extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 40),
-        SizedBox(
-          width: double.infinity,
-          height: 56,
-          child: ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.darkNavy,
-              foregroundColor: Colors.white,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-            ),
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'CONFIRM BOOKING',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1,
-                  ),
-                ),
-                SizedBox(width: 12),
-                Icon(Icons.arrow_forward_rounded, size: 20),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 30),
         Text(
           'Standard rates applied based on local guidelines.',
-          style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 11,
+            color: Colors.grey.shade500,
+            fontStyle: FontStyle.italic,
+          ),
         ),
         const SizedBox(height: 20),
       ],
