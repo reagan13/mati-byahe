@@ -6,6 +6,7 @@ import 'widgets/home_header.dart';
 import 'widgets/dashboard_cards.dart';
 import 'widgets/verification_overlay.dart';
 import 'widgets/location_selector.dart';
+import 'widgets/action_grid_widget.dart';
 import 'home_controller.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -69,11 +70,9 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
-    return SizedBox.expand(
-      child: Material(
-        color: Colors.white,
-        child: !_isVerified ? _buildRestrictedView() : _buildHomeContent(),
-      ),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: !_isVerified ? _buildRestrictedView() : _buildHomeContent(),
     );
   }
 
@@ -108,32 +107,32 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildHomeContent() {
-    return SingleChildScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.only(bottom: 120),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          HomeHeader(email: widget.email, role: widget.role),
-          const Padding(
-            padding: EdgeInsets.fromLTRB(10, 20, 10, 12),
-            child: Text(
-              'Active Status',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-                color: AppColors.darkNavy,
+    return Column(
+      children: [
+        // Original HomeHeader kept exactly as is
+        HomeHeader(email: widget.email, role: widget.role),
+
+        // Use Expanded to fill space without allowing parent scroll
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 20),
+              // Dashboard Card
+              const DashboardCards(
+                tripCount: 4,
+                driverName: "Lito Lapid",
+                plateNumber: "CLB 4930",
               ),
-            ),
+              // Action Grid (Report, News, Track Expense)
+              const ActionGridWidget(),
+              const SizedBox(height: 10),
+              // Location Section
+              const Expanded(child: LocationSelector()),
+            ],
           ),
-          const DashboardCards(
-            tripCount: 4,
-            driverName: "Lito Lapid",
-            plateNumber: "CLB 4930",
-          ),
-          const LocationSelector(),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

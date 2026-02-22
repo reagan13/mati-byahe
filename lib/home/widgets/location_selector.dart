@@ -55,12 +55,9 @@ class _LocationSelectorState extends State<LocationSelector> {
 
   double? _calculateFare() {
     if (_pickup == null || _drop == null || _pickup == _drop) return null;
-
     List<String> route = [_pickup!, _drop!]..sort();
     String key = route.join('_');
-
     if (_fixedRouteFares.containsKey(key)) return _fixedRouteFares[key];
-
     int idx1 = _matiBarangays.indexOf(_pickup!);
     int idx2 = _matiBarangays.indexOf(_drop!);
     return 20.0 + ((idx1 - idx2).abs() * 6.5) + (idx1 % 5);
@@ -86,49 +83,58 @@ class _LocationSelectorState extends State<LocationSelector> {
     );
   }
 
+  void _resetTrip() {
+    setState(() {
+      _pickup = null;
+      _drop = null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final fare = _calculateFare();
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Plan your trip',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w800,
-              color: AppColors.darkNavy,
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Plan your trip',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+                color: AppColors.darkNavy,
+              ),
             ),
-          ),
-          const SizedBox(height: 18),
-          Row(
-            children: [
-              Expanded(
-                child: LocationInputField(
-                  label: 'Pick-up Point',
-                  value: _pickup,
-                  icon: Icons.circle,
-                  iconColor: AppColors.primaryBlue,
-                  onTap: () => _openLocationSearch(true),
+            const SizedBox(height: 18),
+            Row(
+              children: [
+                Expanded(
+                  child: LocationInputField(
+                    label: 'Pick-up Point',
+                    value: _pickup,
+                    icon: Icons.circle,
+                    iconColor: AppColors.primaryBlue,
+                    onTap: () => _openLocationSearch(true),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: LocationInputField(
-                  label: 'Drop-off Point',
-                  value: _drop,
-                  icon: Icons.location_on,
-                  iconColor: const Color(0xFFF44336),
-                  onTap: () => _openLocationSearch(false),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: LocationInputField(
+                    label: 'Drop-off Point',
+                    value: _drop,
+                    icon: Icons.location_on,
+                    iconColor: const Color(0xFFF44336),
+                    onTap: () => _openLocationSearch(false),
+                  ),
                 ),
-              ),
-            ],
-          ),
-          if (fare != null) FareDisplay(fare: fare),
-        ],
+              ],
+            ),
+            if (fare != null) FareDisplay(fare: fare, onArrived: _resetTrip),
+          ],
+        ),
       ),
     );
   }

@@ -4,8 +4,9 @@ import '../../core/constant/app_texts.dart';
 
 class FareDisplay extends StatelessWidget {
   final double fare;
+  final VoidCallback onArrived;
 
-  const FareDisplay({super.key, required this.fare});
+  const FareDisplay({super.key, required this.fare, required this.onArrived});
 
   @override
   Widget build(BuildContext context) {
@@ -28,21 +29,25 @@ class FareDisplay extends StatelessWidget {
             Expanded(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.timer_outlined,
-                    size: 22,
-                    color: AppColors.darkNavy.withOpacity(0.5),
+                  ElevatedButton(
+                    onPressed: onArrived,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryBlue,
+                      foregroundColor: Colors.white,
+                      shape: const CircleBorder(),
+                      padding: const EdgeInsets.all(12),
+                      elevation: 2,
+                    ),
+                    child: const Icon(Icons.check, size: 20),
                   ),
                   const SizedBox(height: 6),
-                  Text(
-                    '15-20 min',
-                    textAlign: TextAlign.center,
+                  const Text(
+                    'Arrive',
                     style: TextStyle(
                       fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.darkNavy.withOpacity(0.7),
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.primaryBlue,
                     ),
                   ),
                 ],

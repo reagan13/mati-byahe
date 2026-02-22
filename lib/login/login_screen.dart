@@ -5,7 +5,7 @@ import '../core/constant/app_colors.dart';
 import '../core/database/local_database.dart';
 import 'widgets/login_widgets.dart';
 import '../signup/register_screen.dart';
-import '../navbar/main_navigation.dart'; // Import MainNavigation instead of HomeScreen
+import '../navigation/main_navigation.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
