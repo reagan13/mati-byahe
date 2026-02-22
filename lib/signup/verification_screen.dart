@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import '../core/constant/app_colors.dart';
 import 'data/signup_repository.dart';
 import 'widgets/signup_background.dart';
 import '../login/widgets/login_widgets.dart';
@@ -53,13 +54,17 @@ class _VerificationScreenState extends State<VerificationScreen> {
               const SizedBox(height: 20),
               const Text(
                 "Account Created!",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.darkNavy,
+                ),
               ),
               const SizedBox(height: 10),
               const Text(
                 "Your account has been verified successfully. You can now log in.",
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey),
+                style: TextStyle(color: AppColors.textGrey),
               ),
               const SizedBox(height: 30),
               PrimaryButton(
@@ -77,7 +82,6 @@ class _VerificationScreenState extends State<VerificationScreen> {
 
   Future<void> _verifyOTP() async {
     if (_codeController.text.length < 8) return;
-
     setState(() => _isLoading = true);
     try {
       await Supabase.instance.client.auth.verifyOTP(
@@ -85,11 +89,8 @@ class _VerificationScreenState extends State<VerificationScreen> {
         type: OtpType.signup,
         email: widget.email,
       );
-
       await _repository.markAsVerified(widget.email);
-
       if (!mounted) return;
-
       setState(() => _isLoading = false);
       _showSuccessDialog();
     } catch (e) {
@@ -102,7 +103,6 @@ class _VerificationScreenState extends State<VerificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
       body: Stack(
         children: [
           const SignupBackground(),
@@ -112,17 +112,25 @@ class _VerificationScreenState extends State<VerificationScreen> {
               child: Column(
                 children: [
                   const SizedBox(height: 60),
-                  const Icon(Icons.security, size: 80, color: Colors.black),
+                  const Icon(
+                    Icons.security,
+                    size: 80,
+                    color: AppColors.darkNavy,
+                  ),
                   const SizedBox(height: 30),
                   const Text(
                     "Verify Account",
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.darkNavy,
+                    ),
                   ),
                   const SizedBox(height: 10),
                   Text(
                     "Enter the 8-digit code sent to\n${widget.email}",
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey[600]),
+                    style: const TextStyle(color: AppColors.textGrey),
                   ),
                   const SizedBox(height: 40),
                   PinCodeTextField(
@@ -137,17 +145,19 @@ class _VerificationScreenState extends State<VerificationScreen> {
                       borderRadius: BorderRadius.circular(8),
                       fieldHeight: 50,
                       fieldWidth: 35,
-                      activeColor: Colors.black,
-                      inactiveColor: Colors.grey[300]!,
-                      selectedColor: Colors.blueAccent,
+                      activeColor: AppColors.primaryBlue,
+                      inactiveColor: AppColors.primaryYellow.withOpacity(0.3),
+                      selectedColor: AppColors.primaryBlue,
                       activeFillColor: Colors.white,
                     ),
                     animationType: AnimationType.fade,
-                    cursorColor: Colors.black,
+                    cursorColor: AppColors.primaryBlue,
                   ),
                   const SizedBox(height: 40),
                   if (_isLoading)
-                    const CircularProgressIndicator(color: Colors.black)
+                    const CircularProgressIndicator(
+                      color: AppColors.primaryBlue,
+                    )
                   else
                     PrimaryButton(label: "Verify Code", onPressed: _verifyOTP),
                   const SizedBox(height: 30),
@@ -155,7 +165,10 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     onPressed: () => Navigator.pop(context),
                     child: const Text(
                       "Back to Registration",
-                      style: TextStyle(color: Colors.grey),
+                      style: TextStyle(
+                        color: AppColors.textGrey,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],

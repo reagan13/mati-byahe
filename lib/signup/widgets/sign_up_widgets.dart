@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/constant/app_colors.dart';
 
 class SignupHeader extends StatelessWidget {
   const SignupHeader({super.key});
@@ -12,7 +13,8 @@ class SignupHeader extends StatelessWidget {
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 26,
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.w900,
+            color: AppColors.darkNavy,
             height: 1.2,
           ),
         ),
@@ -20,11 +22,7 @@ class SignupHeader extends StatelessWidget {
         Text(
           'Access your rides. Track trips. Manage your travels with ease.',
           textAlign: TextAlign.center,
-          style: TextStyle(
-            color: Color(0xFF607D8B),
-            fontSize: 14,
-            fontStyle: FontStyle.italic,
-          ),
+          style: TextStyle(color: AppColors.textGrey, fontSize: 14),
         ),
       ],
     );
@@ -60,16 +58,32 @@ class RoleSelector extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.grey[300] : Colors.white.withOpacity(0.5),
+          color: isSelected
+              ? AppColors.primaryBlue
+              : Colors.white.withOpacity(0.5),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? Colors.grey[400]! : Colors.transparent,
+            color: isSelected
+                ? AppColors.primaryBlue
+                : AppColors.primaryYellow.withOpacity(0.3),
           ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: AppColors.primaryBlue.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : [],
         ),
         child: Center(
           child: Text(
             role,
-            style: const TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: isSelected ? Colors.white : AppColors.darkNavy,
+            ),
           ),
         ),
       ),

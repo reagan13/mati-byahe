@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/constant/app_colors.dart';
 import '../login/widgets/login_widgets.dart';
 import 'widgets/sign_up_widgets.dart';
 import 'widgets/signup_background.dart';
@@ -18,6 +19,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _confirmPasswordController = TextEditingController();
   final SignupRepository _repository = SignupRepository();
   bool _isPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
   String _userRole = 'Passenger';
 
   @override
@@ -44,7 +46,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
       body: Stack(
         children: [
           const SignupBackground(),
@@ -75,6 +76,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         _isPasswordVisible
                             ? Icons.visibility
                             : Icons.visibility_off,
+                        color: AppColors.primaryBlue.withOpacity(0.5),
                       ),
                       onPressed: () => setState(
                         () => _isPasswordVisible = !_isPasswordVisible,
@@ -85,7 +87,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   LoginInput(
                     controller: _confirmPasswordController,
                     label: 'Confirm Password',
-                    obscureText: true,
+                    obscureText: !_isConfirmPasswordVisible,
+                    suffix: IconButton(
+                      icon: Icon(
+                        _isConfirmPasswordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                        color: AppColors.primaryBlue.withOpacity(0.5),
+                      ),
+                      onPressed: () => setState(
+                        () => _isConfirmPasswordVisible =
+                            !_isConfirmPasswordVisible,
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 40),
                   PrimaryButton(
@@ -127,9 +141,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
+                      const Text(
                         "Have an account already? ",
-                        style: TextStyle(color: Colors.grey[600]),
+                        style: TextStyle(color: AppColors.textGrey),
                       ),
                       GestureDetector(
                         onTap: () => Navigator.pop(context),
@@ -137,7 +151,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           'Login',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                            color: AppColors.primaryBlue,
                           ),
                         ),
                       ),
@@ -147,8 +161,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const Text(
                     'Digital Solutions You Can Trust.',
                     style: TextStyle(
-                      color: Colors.grey,
+                      color: AppColors.darkNavy,
                       fontSize: 12,
+                      fontWeight: FontWeight.w500,
                       letterSpacing: 0.5,
                     ),
                   ),

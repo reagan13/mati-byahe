@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/constant/app_colors.dart';
 
 class LoginInput extends StatelessWidget {
   final TextEditingController controller;
@@ -25,9 +26,9 @@ class LoginInput extends StatelessWidget {
         filled: true,
         fillColor: Colors.white.withOpacity(0.9),
         labelText: label,
-        labelStyle: TextStyle(color: Colors.grey[500], fontSize: 14),
+        labelStyle: const TextStyle(color: AppColors.textGrey, fontSize: 14),
         floatingLabelStyle: const TextStyle(
-          color: Colors.black,
+          color: AppColors.primaryBlue,
           fontWeight: FontWeight.bold,
         ),
         contentPadding: const EdgeInsets.symmetric(
@@ -37,15 +38,18 @@ class LoginInput extends StatelessWidget {
         suffixIcon: suffix,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radius),
-          borderSide: BorderSide(color: Colors.grey[300]!),
+          borderSide: const BorderSide(color: Color(0xFFE0E0E0)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radius),
-          borderSide: BorderSide(color: Colors.grey[200]!),
+          borderSide: const BorderSide(color: AppColors.softWhite),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radius),
-          borderSide: const BorderSide(color: Colors.black, width: 1.5),
+          borderSide: const BorderSide(
+            color: AppColors.primaryBlue,
+            width: 1.5,
+          ),
         ),
       ),
     );
@@ -57,6 +61,7 @@ class PrimaryButton extends StatelessWidget {
   final VoidCallback onPressed;
   final double height;
   final double radius;
+  final Color? backgroundColor;
 
   const PrimaryButton({
     super.key,
@@ -64,6 +69,7 @@ class PrimaryButton extends StatelessWidget {
     required this.onPressed,
     this.height = 56.0,
     this.radius = 12.0,
+    this.backgroundColor,
   });
 
   @override
@@ -74,12 +80,12 @@ class PrimaryButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.black,
+          backgroundColor: backgroundColor ?? AppColors.primaryBlue,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(radius),
           ),
-          elevation: 2,
+          elevation: 0,
         ),
         child: Text(
           label,
@@ -97,12 +103,29 @@ class LoginDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Expanded(child: Divider(color: Colors.grey[300])),
+        Expanded(
+          child: Divider(
+            color: AppColors.primaryBlue.withOpacity(0.2),
+            thickness: 1.5,
+          ),
+        ),
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 16),
-          child: Text('Or', style: TextStyle(color: Colors.grey, fontSize: 13)),
+          child: Text(
+            'Or',
+            style: TextStyle(
+              color: AppColors.textGrey,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ),
-        Expanded(child: Divider(color: Colors.grey[300])),
+        Expanded(
+          child: Divider(
+            color: AppColors.primaryBlue.withOpacity(0.2),
+            thickness: 1.5,
+          ),
+        ),
       ],
     );
   }
@@ -112,7 +135,7 @@ class DotGridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.blueGrey.withOpacity(0.1)
+      ..color = AppColors.primaryBlue.withOpacity(0.05)
       ..strokeCap = StrokeCap.round
       ..strokeWidth = 1.5;
 

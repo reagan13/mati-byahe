@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/constant/app_colors.dart';
 import 'widgets/login_widgets.dart';
 import '../signup/register_screen.dart';
 
@@ -24,44 +25,38 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.transparent,
       body: Stack(
         children: [
           const _LoginBackground(),
           Positioned.fill(child: CustomPaint(painter: DotGridPainter())),
           SafeArea(
-            child: Padding(
+            child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 30.0),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  const SizedBox(height: 80),
                   const Text(
                     'Hop In · Log In to Your\nByahe Account',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 26,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.darkNavy,
                       height: 1.2,
                     ),
                   ),
                   const SizedBox(height: 12),
                   const Text(
-                    'Access your rides. Track trips. Manage your travels with ease.',
+                    'Access your rides. Track trips. Manage your travels.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Color(0xFF607D8B),
-                      fontSize: 14,
-                      fontStyle: FontStyle.italic,
-                    ),
+                    style: TextStyle(color: AppColors.textGrey, fontSize: 14),
                   ),
-                  const SizedBox(height: 48),
-
+                  const SizedBox(height: 50),
                   LoginInput(
                     controller: _emailController,
                     label: 'Email Address',
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
                   LoginInput(
                     controller: _passwordController,
                     label: 'Password',
@@ -71,7 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         _isPasswordVisible
                             ? Icons.visibility
                             : Icons.visibility_off,
-                        color: Colors.grey[400],
+                        color: AppColors.primaryBlue.withOpacity(0.5),
                       ),
                       onPressed: () => setState(
                         () => _isPasswordVisible = !_isPasswordVisible,
@@ -79,22 +74,28 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 40),
-
                   PrimaryButton(label: 'Login', onPressed: () {}),
                   const SizedBox(height: 20),
                   const LoginDivider(),
                   const SizedBox(height: 20),
-                  PrimaryButton(label: 'Continue as Guest', onPressed: () {}),
-
+                  PrimaryButton(
+                    label: 'Continue as Guest',
+                    onPressed: () {},
+                    backgroundColor: AppColors.darkNavy,
+                  ),
                   const SizedBox(height: 32),
                   _buildRegisterPrompt(),
-
-                  // Footer Tagline added here
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 80),
                   const Text(
                     'Digital Solutions You Can Trust.',
-                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                    style: TextStyle(
+                      color: AppColors.darkNavy,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 0.8,
+                    ),
                   ),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
@@ -108,20 +109,21 @@ class _LoginScreenState extends State<LoginScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
+        const Text(
           "Don't have An Account? ",
-          style: TextStyle(color: Colors.grey[600]),
+          style: TextStyle(color: AppColors.textGrey),
         ),
         GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const RegisterScreen()),
-            );
-          },
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const RegisterScreen()),
+          ),
           child: const Text(
             'Register',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: AppColors.primaryBlue,
+            ),
           ),
         ),
       ],
@@ -138,8 +140,11 @@ class _LoginBackground extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          stops: [0.0, 0.5, 1.0],
-          colors: [Color(0xFFFFFFFF), Color(0xFFF1F7FF), Color(0xFFD7E9FF)],
+          colors: [
+            AppColors.bgYellowStart,
+            AppColors.bgYellowMid,
+            AppColors.bgYellowEnd,
+          ],
         ),
       ),
     );
