@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/constant/app_colors.dart';
 
 class DashboardCards extends StatelessWidget {
   final int tripCount;
@@ -15,12 +16,19 @@ class DashboardCards extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: const Color(0xFF1A1D1E),
-          borderRadius: BorderRadius.circular(28),
+          color: AppColors.darkNavy,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.darkNavy.withOpacity(0.15),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+          ],
         ),
         child: Stack(
           children: [
@@ -33,18 +41,16 @@ class DashboardCards extends StatelessWidget {
                   const Text(
                     'TODAY TRIP',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Colors.white60,
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
                       letterSpacing: 1.2,
                     ),
                   ),
                   const SizedBox(height: 12),
-                  // Horizontal layout for Trip Count and Driver Info
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // Left Panel: Trip Count
                       Expanded(
                         flex: 2,
                         child: Text(
@@ -57,7 +63,6 @@ class DashboardCards extends StatelessWidget {
                           ),
                         ),
                       ),
-                      // Right Panel: Driver Info
                       Expanded(
                         flex: 3,
                         child: Column(
@@ -90,11 +95,10 @@ class DashboardCards extends StatelessWidget {
                           ],
                         ),
                       ),
-                      // Flag Icon
-                      Icon(
+                      const Icon(
                         Icons.flag_rounded,
-                        color: const Color(0xFFF44336),
-                        size: 24,
+                        color: AppColors.primaryYellow,
+                        size: 26,
                       ),
                     ],
                   ),
@@ -110,13 +114,13 @@ class DashboardCards extends StatelessWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFD7FF5F),
+                  color: AppColors.primaryYellow,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Text(
                   'ONGOING',
                   style: TextStyle(
-                    color: Colors.black,
+                    color: AppColors.darkNavy,
                     fontWeight: FontWeight.w900,
                     fontSize: 9,
                   ),
