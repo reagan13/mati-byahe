@@ -75,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
           automaticallyImplyLeading: false,
         ),
         body: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -111,14 +111,14 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             HomeHeader(email: widget.email, role: widget.role),
             const Padding(
-              padding: EdgeInsets.fromLTRB(24, 20, 24, 12),
+              padding: EdgeInsets.fromLTRB(10, 20, 10, 12),
               child: Text(
                 'Active Status',
                 style: TextStyle(

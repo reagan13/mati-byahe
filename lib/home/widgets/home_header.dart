@@ -11,23 +11,18 @@ class HomeHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(24, 50, 24, 20),
+      padding: const EdgeInsets.fromLTRB(10, 50, 10, 20),
       decoration: BoxDecoration(
-        color: Colors.white, // Solid white background
+        color: Colors.white,
         border: const Border(
           bottom: BorderSide(
-            color: Color.fromARGB(
-              255,
-              247,
-              247,
-              247,
-            ), // Your requested stroke color
+            color: Color.fromARGB(255, 247, 247, 247),
             width: 1.0,
           ),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03), // Very subtle shadow
+            color: Colors.black.withOpacity(0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
