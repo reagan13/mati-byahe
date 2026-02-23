@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../core/constant/app_colors.dart';
 import 'widgets/passenger_nav_bar.dart';
 import 'widgets/driver_nav_bar.dart';
+import '../profile/profile_screen.dart';
 import 'navigation_screens.dart';
 
 class MainNavigation extends StatefulWidget {

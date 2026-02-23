@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../home/home_screen.dart';
+import '../profile/profile_screen.dart';
 import '../core/constant/app_texts.dart';
 
 class NavigationScreens {
@@ -11,7 +12,7 @@ class NavigationScreens {
         HomeScreen(email: email, role: role),
         _placeholder(AppTexts.navEarnings),
         _placeholder(AppTexts.navVehicle),
-        _placeholder(AppTexts.navProfile),
+        ProfileScreen(email: email, role: role),
       ];
     }
 
@@ -20,7 +21,7 @@ class NavigationScreens {
       _placeholder(AppTexts.navHistory),
       _placeholder("Scanner"),
       _placeholder(AppTexts.navReport),
-      _placeholder(AppTexts.navProfile),
+      ProfileScreen(email: email, role: role),
     ];
   }
 

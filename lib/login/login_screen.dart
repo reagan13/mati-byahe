@@ -1,11 +1,10 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../core/constant/app_colors.dart';
-import '../core/database/local_database.dart';
 import 'widgets/login_widgets.dart';
 import '../signup/register_screen.dart';
 import '../navigation/main_navigation.dart';
+import '../core/services/auth_service.dart';
+import '../core/models/user_model.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,7 +16,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final LocalDatabase _localDb = LocalDatabase();
+  final AuthService _authService = AuthService();
   bool _isPasswordVisible = false;
   bool _isLoading = false;
 
@@ -53,43 +52,13 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final db = await _localDb.database;
-      final List<Map<String, dynamic>> localUsers = await db.query(
-        'users',
-        where: 'email = ? AND password = ?',
-        whereArgs: [email, password],
-      );
+      final user = await _authService.login(email, password);
 
-      if (localUsers.isEmpty) {
+      if (user != null) {
+        _navigateToHome(user);
+      } else {
         _showNotification("Invalid email or password.");
-        return;
       }
-
-      final String role = localUsers.first['role'] ?? "Passenger";
-
-      try {
-        final internetResult = await InternetAddress.lookup('google.com');
-        if (internetResult.isNotEmpty &&
-            internetResult[0].rawAddress.isNotEmpty) {
-          try {
-            await Supabase.instance.client.auth.signInWithPassword(
-              email: email,
-              password: password,
-            );
-          } on AuthException catch (e) {
-            if (e.message.contains('Invalid login credentials') ||
-                e.statusCode == '400') {
-              await Supabase.instance.client.auth.signUp(
-                email: email,
-                password: password,
-                data: {'role': role},
-              );
-            }
-          }
-        }
-      } catch (_) {}
-
-      _navigateToHome(email, role);
     } catch (e) {
       _showNotification("An error occurred during login.");
     } finally {
@@ -97,11 +66,12 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  void _navigateToHome(String email, String role) {
+  void _navigateToHome(UserModel user) {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => MainNavigation(email: email, role: role),
+        builder: (context) =>
+            MainNavigation(email: user.email, role: user.role),
       ),
     );
   }
