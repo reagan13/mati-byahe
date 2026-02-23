@@ -29,4 +29,5 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/
+    - assets/data/mati_master_taripa.json
     - .env

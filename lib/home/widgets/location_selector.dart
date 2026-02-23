@@ -1,8 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'location_input_field.dart';
 import 'location_search_sheet.dart';
 import 'fare_display.dart';
-import '../../core/models/trip_model.dart';
 import '../../core/services/fare_service.dart';
 import '../../core/constant/app_colors.dart';
 
@@ -18,6 +19,58 @@ class LocationSelector extends StatefulWidget {
 class _LocationSelectorState extends State<LocationSelector> {
   String? _pickup;
   String? _drop;
+  List<String> _allLocations = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLocations();
+  }
+
+  Future<void> _loadLocations() async {
+    try {
+      final String response = await rootBundle.loadString(
+        'assets/data/mati_master_taripa.json',
+      );
+      final List<dynamic> data = json.decode(response);
+      final Set<String> locations = {};
+
+      for (var section in data) {
+        if (section.containsKey('terminal')) {
+          locations.add(
+            section['terminal']
+                .toString()
+                .replaceAll('FARE RATE MATRIX (TARIPA)', '')
+                .trim(),
+          );
+        }
+
+        final List<dynamic> matrix = section['fare_matrix'] ?? [];
+        for (var route in matrix) {
+          if (route.containsKey('from')) {
+            locations.add(route['from'].toString().trim());
+          }
+          if (route.containsKey('to')) {
+            List<String> toParts = route['to'].toString().split(',');
+            for (var part in toParts) {
+              if (part.trim().isNotEmpty) {
+                locations.add(part.trim());
+              }
+            }
+          }
+          if (route.containsKey('destination')) {
+            locations.add(route['destination'].toString().trim());
+          }
+        }
+      }
+
+      setState(() {
+        _allLocations = locations.where((s) => s.isNotEmpty).toList()..sort();
+      });
+    } catch (e) {
+      debugPrint("Error loading locations: $e");
+    }
+  }
 
   void _resetTrip() => setState(() {
     _pickup = null;
@@ -26,7 +79,10 @@ class _LocationSelectorState extends State<LocationSelector> {
 
   @override
   Widget build(BuildContext context) {
-    final fare = FareService.calculateTripFare(_pickup, _drop);
+    final double? fare = (_pickup != null && _drop != null)
+        ? FareService.calculateTripFare(_pickup, _drop)
+        : null;
+
     final bool hasSelection = _pickup != null || _drop != null;
 
     return Padding(
@@ -142,7 +198,7 @@ class _LocationSelectorState extends State<LocationSelector> {
       backgroundColor: Colors.transparent,
       builder: (context) => LocationSearchSheet(
         title: isPickup ? 'Select Pickup Point' : 'Select Destination',
-        barangays: TripConstants.matiBarangays,
+        barangays: _allLocations,
         onSelected: (val) {
           setState(() {
             if (isPickup) {
