@@ -93,6 +93,7 @@ class _LocationSelectorState extends State<LocationSelector> {
   @override
   Widget build(BuildContext context) {
     final fare = _calculateFare();
+    final bool hasSelection = _pickup != null || _drop != null;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
@@ -100,13 +101,35 @@ class _LocationSelectorState extends State<LocationSelector> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Plan your trip',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-                color: AppColors.darkNavy,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Plan your trip',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.darkNavy,
+                  ),
+                ),
+                if (hasSelection)
+                  TextButton(
+                    onPressed: _resetTrip,
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      minimumSize: const Size(50, 30),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: const Text(
+                      'Clear',
+                      style: TextStyle(
+                        color: Colors.redAccent,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(height: 18),
             Row(
@@ -132,7 +155,40 @@ class _LocationSelectorState extends State<LocationSelector> {
                 ),
               ],
             ),
-            if (fare != null) FareDisplay(fare: fare, onArrived: _resetTrip),
+            const SizedBox(height: 20),
+            if (fare != null)
+              FareDisplay(fare: fare, onArrived: _resetTrip)
+            else
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 40),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.route_outlined,
+                        size: 48,
+                        color: AppColors.darkNavy.withOpacity(0.1),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'No route selected yet',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.darkNavy.withOpacity(0.3),
+                        ),
+                      ),
+                      Text(
+                        'Select both points to see the fare',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColors.darkNavy.withOpacity(0.2),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
           ],
         ),
       ),
