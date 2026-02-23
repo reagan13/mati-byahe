@@ -16,12 +16,17 @@ class LocalDatabase {
 
     return await openDatabase(
       pathName,
-      version: 4,
+      version: 7,
       onCreate: (db, version) async {
         await _createTables(db);
       },
       onUpgrade: (db, oldVersion, newVersion) async {
-        await _createTables(db);
+        if (oldVersion < 7) {
+          await db.execute('DROP TABLE IF EXISTS active_fare');
+          await db.execute(
+            'CREATE TABLE active_fare(email TEXT PRIMARY KEY, fare REAL)',
+          );
+        }
       },
     );
   }
@@ -37,5 +42,37 @@ class LocalDatabase {
         is_synced INTEGER DEFAULT 0
       )
     ''');
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS active_fare(
+        email TEXT PRIMARY KEY,
+        fare REAL
+      )
+    ''');
+  }
+
+  Future<void> saveActiveFare(String email, double fare) async {
+    final db = await database;
+    await db.insert('active_fare', {
+      'email': email,
+      'fare': fare,
+    }, conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future<double?> getActiveFare(String email) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'active_fare',
+      where: 'email = ?',
+      whereArgs: [email],
+    );
+    if (maps.isNotEmpty) {
+      return maps.first['fare'] as double;
+    }
+    return null;
+  }
+
+  Future<void> clearActiveFare(String email) async {
+    final db = await database;
+    await db.delete('active_fare', where: 'email = ?', whereArgs: [email]);
   }
 }

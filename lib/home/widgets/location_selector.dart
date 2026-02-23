@@ -7,7 +7,9 @@ import '../../core/services/fare_service.dart';
 import '../../core/constant/app_colors.dart';
 
 class LocationSelector extends StatefulWidget {
-  const LocationSelector({super.key});
+  final Function(double) onFareCalculated;
+
+  const LocationSelector({super.key, required this.onFareCalculated});
 
   @override
   State<LocationSelector> createState() => _LocationSelectorState();
@@ -89,7 +91,13 @@ class _LocationSelectorState extends State<LocationSelector> {
             ),
             const SizedBox(height: 20),
             if (fare != null)
-              FareDisplay(fare: fare, onArrived: _resetTrip)
+              FareDisplay(
+                fare: fare,
+                onArrived: () {
+                  widget.onFareCalculated(fare);
+                  _resetTrip();
+                },
+              )
             else
               Center(
                 child: Padding(

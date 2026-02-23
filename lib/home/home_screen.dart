@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/constant/app_colors.dart';
+import '../core/database/local_database.dart';
 import '../core/database/sync_service.dart';
 import '../signup/verification_screen.dart';
 import 'widgets/home_header.dart';
@@ -7,6 +8,7 @@ import 'widgets/dashboard_cards.dart';
 import 'widgets/verification_overlay.dart';
 import 'widgets/location_selector.dart';
 import 'widgets/action_grid_widget.dart';
+import 'widgets/fare_display.dart';
 import 'home_controller.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -18,16 +20,27 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen>
+    with AutomaticKeepAliveClientMixin {
   final HomeController _controller = HomeController();
+  final LocalDatabase _localDb = LocalDatabase();
   bool _isVerified = false;
   bool _isLoading = true;
   bool _isSendingCode = false;
+  double? _persistedFare;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
     super.initState();
-    _loadStatus();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    await _loadStatus();
+    await _loadSavedFare();
   }
 
   Future<void> _loadStatus() async {
@@ -39,6 +52,25 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     }
     SyncService().syncOnStart();
+  }
+
+  Future<void> _loadSavedFare() async {
+    final fare = await _localDb.getActiveFare(widget.email);
+    if (mounted && fare != null) {
+      setState(() {
+        _persistedFare = fare;
+      });
+    }
+  }
+
+  Future<void> _handleFareUpdate(double fare) async {
+    setState(() => _persistedFare = fare);
+    await _localDb.saveActiveFare(widget.email, fare);
+  }
+
+  Future<void> _clearFare() async {
+    setState(() => _persistedFare = null);
+    await _localDb.clearActiveFare(widget.email);
   }
 
   Future<void> _handleVerification() async {
@@ -63,6 +95,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     if (_isLoading) {
       return Container(
         color: Colors.white,
@@ -109,26 +143,26 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildHomeContent() {
     return Column(
       children: [
-        // Original HomeHeader kept exactly as is
         HomeHeader(email: widget.email, role: widget.role),
-
-        // Use Expanded to fill space without allowing parent scroll
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              // Dashboard Card
-              const DashboardCards(
-                tripCount: 4,
-                driverName: "Lito Lapid",
-                plateNumber: "CLB 4930",
-              ),
-              // Action Grid (Report, News, Track Expense)
-              const ActionGridWidget(),
-              const SizedBox(height: 10),
-              // Location Section
-              const Expanded(child: LocationSelector()),
+              if (_persistedFare != null)
+                FareDisplay(fare: _persistedFare!, onArrived: _clearFare)
+              else ...[
+                const DashboardCards(
+                  tripCount: 4,
+                  driverName: "Lito Lapid",
+                  plateNumber: "CLB 4930",
+                ),
+                const ActionGridWidget(),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: LocationSelector(onFareCalculated: _handleFareUpdate),
+                ),
+              ],
             ],
           ),
         ),

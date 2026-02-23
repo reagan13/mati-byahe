@@ -17,7 +17,7 @@ class VerificationOverlay extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(
           color: AppColors.primaryYellow.withOpacity(0.3),
           width: 1.5,

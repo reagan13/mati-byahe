@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import '../core/constant/app_colors.dart';
 import 'widgets/passenger_nav_bar.dart';
 import 'widgets/driver_nav_bar.dart';
-import '../profile/profile_screen.dart';
 import 'navigation_screens.dart';
 
 class MainNavigation extends StatefulWidget {
@@ -52,7 +50,7 @@ class _MainNavigationState extends State<MainNavigation>
     return Scaffold(
       backgroundColor: Colors.white,
       extendBody: !isDriver,
-      body: screens[_selectedIndex],
+      body: IndexedStack(index: _selectedIndex, children: screens),
       floatingActionButton: isDriver
           ? null
           : PassengerFloatingButton(
