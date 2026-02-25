@@ -105,37 +105,54 @@ class _HomeScreenState extends State<HomeScreen>
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: !_isVerified ? _buildRestrictedView() : _buildHomeContent(),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              AppColors.primaryYellow.withOpacity(0.2),
+              Colors.white,
+              AppColors.primaryYellow.withOpacity(0.1),
+            ],
+            stops: const [0.0, 0.5, 1.0],
+          ),
+        ),
+        child: !_isVerified ? _buildRestrictedView() : _buildHomeContent(),
+      ),
     );
   }
 
   Widget _buildRestrictedView() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(
-            Icons.lock_person_rounded,
-            size: 80,
-            color: AppColors.primaryYellow,
-          ),
-          const SizedBox(height: 24),
-          const Text(
-            "Access Restricted",
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w900,
-              color: AppColors.darkNavy,
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.lock_person_rounded,
+              size: 80,
+              color: AppColors.primaryYellow,
             ),
-          ),
-          const SizedBox(height: 32),
-          VerificationOverlay(
-            isSendingCode: _isSendingCode,
-            onVerify: _handleVerification,
-          ),
-        ],
+            const SizedBox(height: 24),
+            const Text(
+              "Access Restricted",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w900,
+                color: AppColors.darkNavy,
+              ),
+            ),
+            const SizedBox(height: 32),
+            VerificationOverlay(
+              isSendingCode: _isSendingCode,
+              onVerify: _handleVerification,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -143,24 +160,29 @@ class _HomeScreenState extends State<HomeScreen>
   Widget _buildHomeContent() {
     return Column(
       children: [
-        HomeHeader(email: widget.email, role: widget.role),
+        const HomeHeader(),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               if (_persistedFare != null)
                 FareDisplay(fare: _persistedFare!, onArrived: _clearFare)
               else ...[
-                const DashboardCards(
+                DashboardCards(
                   tripCount: 4,
                   driverName: "Lito Lapid",
                   plateNumber: "CLB 4930",
+                  email: widget.email,
+                  role: widget.role,
                 ),
                 const ActionGridWidget(),
                 const SizedBox(height: 10),
                 Expanded(
-                  child: LocationSelector(onFareCalculated: _handleFareUpdate),
+                  child: LocationSelector(
+                    email: widget.email,
+                    onFareCalculated: _handleFareUpdate,
+                  ),
                 ),
               ],
             ],

@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 
 class FareService {
   static List<dynamic>? _taripaData;
-  static double currentGasPrice = 75.0;
+  static List<String> availableTiers = [];
 
   static Future<void> init() async {
     try {
@@ -11,6 +11,17 @@ class FareService {
         'assets/data/mati_master_taripa.json',
       );
       _taripaData = json.decode(response);
+
+      if (_taripaData != null && _taripaData!.isNotEmpty) {
+        for (var section in _taripaData!) {
+          var matrix = section['fare_matrix'];
+          if (matrix != null && matrix.isNotEmpty) {
+            Map<String, dynamic> rates = matrix[0]['rates'];
+            availableTiers = rates.keys.toList();
+            break;
+          }
+        }
+      }
     } catch (e) {
       _taripaData = null;
     }
@@ -18,76 +29,97 @@ class FareService {
 
   static double? calculateTripFare(
     String? pickup,
-    String? drop, {
+    String? drop,
+    String selectedTier, {
     bool isDiscounted = false,
   }) {
     if (_taripaData == null ||
         pickup == null ||
         drop == null ||
-        pickup == drop) {
+        pickup == drop ||
+        selectedTier.isEmpty) {
       return null;
     }
 
     for (var terminalGroup in _taripaData!) {
-      String terminalName = terminalGroup['terminal'] ?? "";
+      String terminalName = (terminalGroup['terminal'] ?? "")
+          .toString()
+          .toLowerCase();
       List<dynamic> fareMatrix = terminalGroup['fare_matrix'] ?? [];
 
       bool pickupIsTerminal =
-          terminalName.toLowerCase().contains(pickup.toLowerCase()) ||
-          terminalName.toLowerCase().contains("city proper");
+          terminalName.contains(pickup.toLowerCase()) ||
+          terminalName.contains("city proper");
       bool dropIsTerminal =
-          terminalName.toLowerCase().contains(drop.toLowerCase()) ||
-          terminalName.toLowerCase().contains("city proper");
+          terminalName.contains(drop.toLowerCase()) ||
+          terminalName.contains("city proper");
 
       if (pickupIsTerminal || dropIsTerminal) {
-        String searchLocation = pickupIsTerminal ? drop : pickup;
+        String searchLocation = pickupIsTerminal
+            ? drop.toLowerCase()
+            : pickup.toLowerCase();
 
         for (var route in fareMatrix) {
-          String? destination = route['destination'] ?? route['to'];
-          String? fromLocation = route['from'];
+          String? destination = (route['destination'] ?? route['to'])
+              ?.toString()
+              .toLowerCase();
+          String? fromLocation = route['from']?.toString().toLowerCase();
 
           bool matchFound = false;
-          if (destination != null &&
-              destination.toLowerCase().contains(
-                searchLocation.toLowerCase(),
-              )) {
-            matchFound = true;
-          } else if (fromLocation != null &&
-              fromLocation.toLowerCase().contains(
-                searchLocation.toLowerCase(),
-              )) {
-            matchFound = true;
+
+          if (destination != null) {
+            List<String> destinations = destination
+                .split(',')
+                .map((e) => e.trim())
+                .toList();
+            if (destinations.any(
+              (d) =>
+                  d == searchLocation ||
+                  searchLocation.contains(d) ||
+                  d.contains(searchLocation),
+            )) {
+              matchFound = true;
+            }
+          }
+
+          if (!matchFound && fromLocation != null) {
+            if (fromLocation.contains(searchLocation)) {
+              matchFound = true;
+            }
           }
 
           if (matchFound) {
-            return _getRateFromPriceMap(route['rates'], isDiscounted);
+            return _getRateForTier(route['rates'], selectedTier, isDiscounted);
           }
         }
       }
     }
-    return isDiscounted ? 15.0 * 0.8 : 15.0;
+
+    return _calculateFallbackFare(selectedTier, isDiscounted);
   }
 
-  static double _getRateFromPriceMap(
+  static double _getRateForTier(
     Map<String, dynamic> rates,
+    String tier,
     bool isDiscounted,
   ) {
-    double? baseFare;
+    double baseFare = (rates[tier] ?? rates.values.first).toDouble();
+    double finalFare = isDiscounted ? (baseFare * 0.8) : baseFare;
+    return _roundToNearestFive(finalFare);
+  }
 
-    rates.forEach((tier, price) {
-      final parts = tier.split('-');
-      double min = double.parse(parts[0]);
-      double max = double.parse(parts[1]);
+  static double _calculateFallbackFare(String tier, bool isDiscounted) {
+    double minFare = 15.0;
+    if (tier == "50.00-69.99") minFare = 20.0;
+    if (tier == "70.00-89.99") minFare = 22.0;
+    if (tier == "90.00-99.99") minFare = 25.0;
 
-      if (currentGasPrice >= min && currentGasPrice <= max) {
-        baseFare = (price is int) ? price.toDouble() : price;
-      }
-    });
+    double finalFare = isDiscounted ? (minFare * 0.8) : minFare;
+    return _roundToNearestFive(finalFare);
+  }
 
-    baseFare ??= (rates.values.first is int)
-        ? rates.values.first.toDouble()
-        : rates.values.first;
-
-    return isDiscounted ? baseFare! * 0.8 : baseFare!;
+  static double _roundToNearestFive(double fare) {
+    if (fare % 5 == 0) return fare;
+    return fare + (5 - (fare % 5));
   }
 }

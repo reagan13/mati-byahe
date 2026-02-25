@@ -12,7 +12,7 @@ class FareDisplay extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const SizedBox(height: 30),
+        const SizedBox(height: 10),
         Text(
           AppTexts.fareLabel.toUpperCase(),
           style: TextStyle(

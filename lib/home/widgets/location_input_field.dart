@@ -22,7 +22,7 @@ class LocationInputField extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(8),
       child: InputDecorator(
         decoration: InputDecoration(
           labelText: label,

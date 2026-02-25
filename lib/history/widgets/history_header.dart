@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../core/constant/app_colors.dart';
 
-class HomeHeader extends StatelessWidget {
-  const HomeHeader({super.key});
+class HistoryHeader extends StatelessWidget {
+  const HistoryHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +12,7 @@ class HomeHeader extends StatelessWidget {
       decoration: const BoxDecoration(color: Colors.white),
       child: const Center(
         child: Text(
-          'HOME',
+          'HISTORY',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w900,

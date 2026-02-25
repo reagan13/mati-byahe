@@ -16,16 +16,34 @@ class LocalDatabase {
 
     return await openDatabase(
       pathName,
-      version: 7,
+      version: 9, // Incremented to 9 to force the update
       onCreate: (db, version) async {
         await _createTables(db);
       },
       onUpgrade: (db, oldVersion, newVersion) async {
+        // Upgrade to version 7 logic (Active Fare)
         if (oldVersion < 7) {
           await db.execute('DROP TABLE IF EXISTS active_fare');
           await db.execute(
             'CREATE TABLE active_fare(email TEXT PRIMARY KEY, fare REAL)',
           );
+        }
+
+        // Upgrade to version 9 logic (Trips History)
+        // This covers any version prior to 9, ensuring the table is created
+        if (oldVersion < 9) {
+          await db.execute('''
+            CREATE TABLE IF NOT EXISTS trips(
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              email TEXT,
+              pickup TEXT,
+              drop_off TEXT,
+              fare REAL,
+              gas_tier TEXT,
+              date TEXT,
+              is_synced INTEGER DEFAULT 0
+            )
+          ''');
         }
       },
     );
@@ -48,6 +66,47 @@ class LocalDatabase {
         fare REAL
       )
     ''');
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS trips(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        email TEXT,
+        pickup TEXT,
+        drop_off TEXT,
+        fare REAL,
+        gas_tier TEXT,
+        date TEXT,
+        is_synced INTEGER DEFAULT 0
+      )
+    ''');
+  }
+
+  Future<void> saveTrip({
+    required String email,
+    required String pickup,
+    required String dropOff,
+    required double fare,
+    required String gasTier,
+  }) async {
+    final db = await database;
+    await db.insert('trips', {
+      'email': email,
+      'pickup': pickup,
+      'drop_off': dropOff,
+      'fare': fare,
+      'gas_tier': gasTier,
+      'date': DateTime.now().toIso8601String(),
+      'is_synced': 0,
+    });
+  }
+
+  Future<List<Map<String, dynamic>>> getTrips(String email) async {
+    final db = await database;
+    return await db.query(
+      'trips',
+      where: 'email = ?',
+      whereArgs: [email],
+      orderBy: 'date DESC',
+    );
   }
 
   Future<void> saveActiveFare(String email, double fare) async {

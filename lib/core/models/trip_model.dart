@@ -1,39 +1,44 @@
-class TripConstants {
-  static const List<String> matiBarangays = [
-    'Badas',
-    'Babangsa',
-    'Bunaan',
-    'Cabuaya',
-    'Central',
-    'Culian',
-    'Dahican',
-    'Danaos',
-    'Don Enrique Lopez',
-    'Don Salvador Lopez',
-    'Don Victoriano Chiongbian',
-    'Langka',
-    'Libudon',
-    'Luban',
-    'Lumbo',
-    'Mamali',
-    'Matiao',
-    'Mayo',
-    'Sainz',
-    'Sanghay',
-    'Tagabakid',
-    'Taguibo',
-    'Tamisan',
-    'Tuatua',
-  ];
+// lib/core/models/trip_model.dart
+class Trip {
+  final int? id;
+  final String pickup;
+  final String dropOff;
+  final double fare;
+  final String gasTier;
+  final DateTime date;
+  final int isSynced; // 0 for local, 1 for cloud
 
-  static const Map<String, double> fixedRouteFares = {
-    'Badas_Dahican': 45.0,
-    'Badas_Central': 35.0,
-    'Central_Dahican': 30.0,
-    'Matiao_Central': 25.0,
-    'Sainz_Central': 28.0,
-    'Dahican_Matiao': 48.0,
-    'Badas_Matiao': 42.0,
-    'Badas_Sainz': 38.0,
-  };
+  Trip({
+    this.id,
+    required this.pickup,
+    required this.dropOff,
+    required this.fare,
+    required this.gasTier,
+    required this.date,
+    this.isSynced = 0,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'pickup': pickup,
+      'dropOff': dropOff,
+      'fare': fare,
+      'gasTier': gasTier,
+      'date': date.toIso8601String(),
+      'isSynced': isSynced,
+    };
+  }
+
+  factory Trip.fromMap(Map<String, dynamic> map) {
+    return Trip(
+      id: map['id'],
+      pickup: map['pickup'],
+      dropOff: map['dropOff'],
+      fare: map['fare'],
+      gasTier: map['gasTier'],
+      date: DateTime.parse(map['date']),
+      isSynced: map['isSynced'],
+    );
+  }
 }
